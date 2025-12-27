@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡單登入系統</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; padding-top: 50px; background-color: #f4f4f4; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .btn-login { background-color: #4CAF50; color: white; }
+        .btn-logout { background-color: #f44336; color: white; margin-top: 20px; }
+        .hidden { display: none; }
+        #status-msg { color: #4CAF50; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="login-form">
+        <h2>歡迎登入</h2>
+        <input type="text" id="username" placeholder="請輸入您的名稱">
+        <button class="btn-login" onclick="handleLogin()">登入</button>
+    </div>
+
+    <div id="welcome-ui" class="hidden">
+        <div id="status-msg">✅ 登入成功！</div>
+        <p>歡迎回來，<span id="display-name"></span></p>
+        <button class="btn-logout" onclick="handleLogout()">登出按鈕</button>
+    </div>
+</div>
+
+<script>
+    // ⚠️ 請將下方的網址替換成你部署 GAS 後得到的 URL
+    const GAS_URL = "YOUR_GAS_URL_HERE";
+
+    // 檢查瀏覽器是否已經記住登入狀態
+    window.onload = function() {
+        const savedName = localStorage.getItem("user_name");
+        if (savedName) {
+            showWelcome(savedName);
+        }
+    };
+
+    async function handleLogin() {
+        const nameInput = document.getElementById("username");
+        const name = nameInput.value.trim();
+
+        if (name === "") {
+            alert("請輸入名稱！");
+            return;
+        }
+
+        // 顯示傳送中狀態
+        const loginBtn = document.querySelector(".btn-login");
+        loginBtn.innerText = "連線中...";
+        loginBtn.disabled = true;
+
+        try {
+            // 3. 將資料傳送到試算表
+            await fetch(GAS_URL, {
+                method: "POST",
+                body: JSON.stringify({ name: name })
+            });
+
+            // 存到本地記憶體並切換畫面
+            localStorage.setItem("user_name", name);
+            showWelcome(name);
+        } catch (error) {
+            alert("登入失敗，請檢查網路或 GAS URL");
+            loginBtn.innerText = "登入";
+            loginBtn.disabled = false;
+        }
+    }
+
+    function showWelcome(name) {
+        document.getElementById("login-form").classList.add("hidden");
+        document.getElementById("welcome-ui").classList.remove("hidden");
+        document.getElementById("display-name").innerText = name;
+    }
+
+    function handleLogout() {
+        // 清除紀錄並重整
+        localStorage.removeItem("user_name");
+        location.reload();
+    }
+</script>
+
+</body>
+</html>
