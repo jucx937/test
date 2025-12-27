@@ -14,6 +14,28 @@
         .btn-logout { background-color: #f44336; color: white; margin-top: 20px; }
         .hidden { display: none; }
         #msg { margin-top: 10px; font-size: 14px; color: #d32f2f; }
+
+        /* --- 寵物動畫設定 --- */
+        .pet-container {
+            margin: 20px 0;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        /* 定義跳動動畫 */
+        @keyframes pet-jump {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+
+        /* 當被加上 .animate 類別時執行的動作 */
+        .pet-animate {
+            animation: pet-jump 0.5s ease-in-out;
+        }
+
+        .pet-container:hover {
+            transform: scale(1.1); /* 滑鼠移上去稍微變大 */
+        }
     </style>
 </head>
 <body>
@@ -30,12 +52,45 @@
     <div id="welcome-ui" class="hidden">
         <h3 style="color: #4CAF50;">✅ 登入成功！</h3>
         <p>歡迎，<span id="display-name"></span></p>
+        
+        <div class="pet-container" onclick="playPetAnimation()" id="pet-svg-box">
+            <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="120" height="120" viewBox="0 0 141.732 141.732">
+                <g>
+                    <ellipse cx="98.193" cy="127.404" rx="10.085" ry="5.833" style="fill:#bc7f67"/>
+                    <ellipse cx="44.109" cy="127.404" rx="10.085" ry="5.833" style="fill:#bc7f67"/>
+                    <ellipse cx="70.867" cy="87.049" rx="46.098" ry="47.298" style="fill:#d8a583"/>
+                    <ellipse cx="71.518" cy="55.449" rx="43.402" ry="24.035" style="fill:#a38e84"/>
+                    <ellipse cx="71.518" cy="53.449" rx="43.402" ry="24.035" style="fill:#d8a583"/>
+                    <path d="m101.9 26.24-13.496-9.847s9.898-11.401 17.438-6.542c6.525 4.206-3.942 16.389-3.942 16.389zM36.461 8.591C44 3.732 53.899 15.133 53.899 15.133L40.401 24.98s-10.464-12.183-3.94-16.389z" style="fill:#b86b4c"/>
+                    <ellipse cx="70.867" cy="43.065" rx="36.547" ry="34.419" style="fill:#d8a583"/>
+                    <ellipse cx="70.404" cy="57.981" rx="18" ry="18.23" style="fill:#bc7f67"/>
+                    <path d="M70.404 49.751v13" style="fill:#040000;stroke:#231815;stroke-width:2;stroke-linecap:round"/>
+                    <path d="M68.367 48.789c1.666 1.333 3.332 1.333 5 0M73.598 65.32c-2.13-1.833-4.258-1.833-6.389 0" style="fill:none;stroke:#231815;stroke-width:2;stroke-linecap:round"/>
+                    <path d="m52.134 33.38 6.47-2.851M89.519 33.38l-6.47-2.851" style="fill:none;stroke:#040000;stroke-width:3;stroke-linecap:round"/>
+                    <ellipse cx="50.326" cy="90.153" rx="10.086" ry="10.347" style="fill:#bc7f67"/>
+                    <ellipse cx="89.519" cy="90.153" rx="10.085" ry="10.348" style="fill:#bc7f67"/>
+                    <ellipse cx="70.338" cy="117.931" rx="37.646" ry="14.196" style="fill:#d8a583"/>
+                </g>
+            </svg>
+        </div>
+
         <button class="btn-logout" onclick="handleLogout()">登出</button>
     </div>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzK_bFDr4kh9bhUfCYLRaEo7AzEeQM-YVz1sZ9SWLWbPPI8J2_fcYpx5Dn9Kwloelw1Kg/exec"; // 👈 請務必更換
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzK_bFDr4kh9bhUfCYLRaEo7AzEeQM-YVz1sZ9SWLWbPPI8J2_fcYpx5Dn9Kwloelw1Kg/exec"; 
+
+    // 寵物動畫函式
+    function playPetAnimation() {
+        const petBox = document.getElementById('pet-svg-box');
+        // 先移除 class (為了能重複觸發動畫)
+        petBox.classList.remove('pet-animate');
+        // 強制瀏覽器重繪 (這是一個小技巧)
+        void petBox.offsetWidth; 
+        // 加上動畫 class
+        petBox.classList.add('pet-animate');
+    }
 
     async function process(actionType) {
         const name = document.getElementById("username").value.trim();
@@ -79,11 +134,9 @@
         location.reload();
     }
 
-    // 自動登入檢查
     if (localStorage.getItem("user_name")) {
         showWelcome(localStorage.getItem("user_name"));
     }
 </script>
 </body>
 </html>
-
